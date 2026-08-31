@@ -1,0 +1,25 @@
+==================================================
+ Pipeline Avance 1 del Reto - LSCA2314
+==================================================
+[Etapa 1/5] Secretos (gitleaks) sobre repo_reto/ ...
+  -> gitleaks encontro secretos (codigo de salida 1).
+[Etapa 2/5] Infraestructura (checkov) sobre repo_reto/infraestructura ...
+(El .tf se analiza de forma estatica, nunca se despliega.)
+  -> checkov encontro configuraciones inseguras (codigo de salida 1).
+[Etapa 3/5] SAST (semgrep) sobre repo_reto/app.py ...
+  -> semgrep encontro hallazgos bloqueantes (codigo de salida 1).
+[Etapa 4/5] SAST (bandit) sobre repo_reto/app.py ...
+  -> bandit encontro hallazgos (codigo de salida 1).
+[Etapa 5/5] Dependencias (pip-audit) sobre repo_reto/requirements.txt ...
+  -> pip-audit encontro vulnerabilidades (codigo de salida 1).
+
+==================================================
+ Resultado de cada etapa
+==================================================
+  Etapa 1 - Secretos (gitleaks): FALLA
+  Etapa 2 - Infraestructura (checkov): FALLA
+  Etapa 3 - SAST (semgrep): FALLA
+  Etapa 4 - SAST (bandit): FALLA
+  Etapa 5 - Dependencias (pip-audit): FALLA
+
+DESPLIEGUE BLOQUEADO

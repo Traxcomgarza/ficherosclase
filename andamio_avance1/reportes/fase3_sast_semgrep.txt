@@ -1,0 +1,38 @@
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 1 file tracked by git with 2 Code rules:
+  Scanning 1 file with 2 python rules.
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+✅ Scan completed successfully.
+ • Findings: 2 (2 blocking)
+ • Rules run: 2
+ • Targets scanned: 1
+ • Parsed lines: ~100.0%
+ • No ignore information available
+Ran 2 rules on 1 file: 2 findings.
+                   
+                   
+┌─────────────────┐
+│ 2 Code Findings │
+└─────────────────┘
+                    
+    repo_reto/app.py
+   ❯❯❱ subprocess-shell-true
+          ❰❰ Blocking ❱❱
+          Uso de subprocess con shell=True y entrada externa puede permitir inyeccion de comandos.
+                                                                                                  
+           25┆ subprocess.call(comando, shell=True)
+   
+    ❯❱ md5-inseguro
+          ❰❰ Blocking ❱❱
+          MD5 no es apto para contrasenas ni para uso criptografico.
+                                                                    
+           30┆ return hashlib.md5(password.encode()).hexdigest()
+

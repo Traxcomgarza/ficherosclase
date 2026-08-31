@@ -1,0 +1,13 @@
+rules:
+  - id: subprocess-shell-true
+    languages: [python]
+    severity: ERROR
+    message: "Uso de subprocess con shell=True y entrada externa puede permitir inyeccion de comandos."
+    patterns:
+      - pattern: subprocess.call($CMD, shell=True)
+  - id: md5-inseguro
+    languages: [python]
+    severity: WARNING
+    message: "MD5 no es apto para contrasenas ni para uso criptografico."
+    patterns:
+      - pattern: hashlib.md5(...)
