@@ -1,0 +1,9 @@
+==================================================
+ Puerta de control: secretos en el historial
+==================================================
+Resultado del escaneo de historial: HALLAZGOS (codigo 1)
+
+DESPLIEGUE BLOQUEADO
+
+Recuerda: borrar el commit NO es la solucion completa. La credencial
+debe rotarse, porque cualquiera que haya clonado el repositorio ya la tiene.

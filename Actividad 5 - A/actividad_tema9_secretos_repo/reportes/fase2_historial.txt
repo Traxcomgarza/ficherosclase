@@ -1,0 +1,22 @@
+
+    ○
+    │╲
+    │ ○
+    ○ ░
+    ░    gitleaks
+
+Finding:     AWS_SECRET_ACCESS_KEY = "hK3nVq8ZpR2wLxT9dYbF7mCsQ4jNgE1uWaXvB6Ro"
+Secret:      hK3nVq8ZpR2wLxT9dYbF7mCsQ4jNgE1uWaXvB6Ro
+RuleID:      generic-api-key
+Entropy:     5.271928
+File:        despliegue_catalogo.py
+Line:        4
+Commit:      3343540cedd8b85015fb3b82ca2b5c50fcb5a7a9
+Author:      Dev Tienda
+Email:       dev@tienda.local
+Date:        2026-09-12T04:03:11Z
+Fingerprint: 3343540cedd8b85015fb3b82ca2b5c50fcb5a7a9:despliegue_catalogo.py:generic-api-key:4
+
+4:07AM INF 2 commits scanned.
+4:07AM INF scanned ~504 bytes (504 bytes) in 200ms
+4:07AM WRN leaks found: 1

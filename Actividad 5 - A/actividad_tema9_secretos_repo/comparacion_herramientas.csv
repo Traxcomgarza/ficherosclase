@@ -1,0 +1,9 @@
+Pregunta,Tu respuesta
+"Fase 1 (gitleaks dir, archivos actuales): cuantos hallazgos hubo?",0
+"Fase 2 (gitleaks git, historial): cuantos hallazgos hubo?",1
+"Que regla (RuleID) reporto gitleaks en el historial?", generic-api-key
+"En que commit quedo guardado el secreto (primeros 7 caracteres)?",22e5cd5
+"Que tipo de detector reporto TruffleHog en la Fase 3?",AWS
+"gitleaks y TruffleHog reportaron exactamente el mismo secreto? Explica la diferencia","No exactamente: gitleaks marco la AWS_SECRET_ACCESS_KEY (linea 4) con una regla generica de patron (generic-api-key); TruffleHog marco el AWS_ACCESS_KEY_ID (linea 3, formato AKIA...) e identifico el proveedor exacto (Detector Type: AWS) porque usa detectores especificos por servicio."
+"Por que un pipeline que solo descarga el ultimo commit no encontraria este secreto?","Un checkout superficial (shallow clone) solo trae el commit HEAD, donde la credencial ya fue removida del archivo; el commit anterior que la contiene ni siquiera se descarga, por eso hace falta fetch-depth: 0 para traer el historial completo."
+"Ya se borro del codigo. Por que NO basta con eso y hay que rotar la credencial?","Borrar el secreto solo quita la version mas reciente; sigue existiendo en los commits anteriores del historial, y cualquiera que haya clonado el repo antes ya tiene esa copia. La unica forma de invalidarla es rotarla: generar una nueva credencial y revocar la anterior en AWS."
