@@ -1,0 +1,10 @@
+Pregunta,Tu respuesta
+"Fase 1: cuantos hallazgos reporto Trivy sobre el Dockerfile original?",5
+"Cual fue el hallazgo CRITICAL y por que es el mas grave de los cinco?","DS-0031: el token API_TOKEN quedo escrito en texto plano con ENV. Es el mas grave porque cualquiera que descargue o inspeccione la imagen puede leer el secreto directamente, a diferencia de los otros hallazgos que son malas practicas de configuracion, no una fuga de credenciales."
+"Por que usar la etiqueta ':latest' es un problema para reproducir una imagen?","':latest' no fija una version concreta, apunta a lo mas reciente publicado en ese momento. La misma instruccion FROM puede traer una imagen base distinta manana, rompiendo la reproducibilidad del build."
+"Que riesgo real hay en que el contenedor corra como root?","Si un atacante compromete la aplicacion dentro del contenedor, al correr como root tiene privilegios completos dentro de ese contenedor y mas superficie para un container escape hacia el host, en vez de quedar limitado a un usuario sin privilegios."
+"Fase 2: cuantos hallazgos quedaron despues de endurecer el Dockerfile?",0
+"Fase 3: cuantas librerias quedaron inventariadas en el SBOM?",3
+"Para que le sirve a un equipo tener el SBOM cuando sale una vulnerabilidad nueva?","Con el SBOM el equipo puede buscar directamente si la libreria y version afectadas estan en la lista de materiales de la imagen, en vez de revisar imagen por imagen manualmente."
+"Fase 4: cuantas vulnerabilidades conocidas trae la lista de dependencias?","26 vulnerabilidades conocidas en 5 paquetes (PyYAML, requests, Jinja2 y las sub-dependencias idna y urllib3), todas por usar versiones muy antiguas fijadas en requirements.txt."
+"Un Dockerfile con 0 hallazgos garantiza que la imagen es segura? Explica","No. Trivy sobre el Dockerfile solo valida como se construye la imagen (usuario, etiquetas, ADD vs COPY, secretos, healthcheck), no revisa las dependencias instaladas. Una imagen con 0 hallazgos en el Dockerfile puede seguir instalando librerias con vulnerabilidades conocidas, como se ve en la Fase 4."

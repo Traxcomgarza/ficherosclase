@@ -1,0 +1,73 @@
+2026-09-12T04:59:08Z	INFO	[misconfig] Misconfiguration scanning is enabled
+2026-09-12T04:59:08Z	INFO	[checks-client] Using existing checks from cache	path="/root/.cache/trivy/policy/content"
+2026-09-12T04:59:09Z	INFO	Detected config files	num=1
+
+Report Summary
+
+┌────────────┬────────────┬───────────────────┐
+│   Target   │    Type    │ Misconfigurations │
+├────────────┼────────────┼───────────────────┤
+│ Dockerfile │ dockerfile │         5         │
+└────────────┴────────────┴───────────────────┘
+Legend:
+- '-': Not scanned
+- '0': Clean (no security findings detected)
+
+
+Dockerfile (dockerfile)
+=======================
+Tests: 27 (SUCCESSES: 22, FAILURES: 5)
+Failures: 5 (UNKNOWN: 0, LOW: 2, MEDIUM: 1, HIGH: 1, CRITICAL: 1)
+
+DS-0001 (MEDIUM): Specify a tag in the 'FROM' statement for image 'python'
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+When using a 'FROM' statement you should use a specific tag to avoid uncontrolled behavior when the image is updated.
+
+See https://avd.aquasec.com/misconfig/ds-0001
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ Dockerfile:1
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1 [ FROM python:latest
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+DS-0002 (HIGH): Specify at least 1 USER command in Dockerfile with non-root user as argument
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+Running containers with 'root' user can lead to a container escape situation. It is a best practice to run containers as non-root users, which can be done by adding a 'USER' statement to the Dockerfile.
+
+See https://avd.aquasec.com/misconfig/ds-0002
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+DS-0005 (LOW): Consider using 'COPY . /app' command instead of 'ADD . /app'
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+You should use COPY instead of ADD unless you want to extract a tar file. Note that an ADD command will extract a tar file, which adds the risk of Zip-based vulnerabilities. Accordingly, it is advised to use a COPY command, which does not extract tar files.
+
+See https://avd.aquasec.com/misconfig/ds-0005
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ Dockerfile:3
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   3 [ ADD . /app
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+DS-0026 (LOW): Add HEALTHCHECK instruction in your Dockerfile
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+You should add HEALTHCHECK instruction in your docker container images to perform the health check on running containers.
+
+See https://avd.aquasec.com/misconfig/ds-0026
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+DS-0031 (CRITICAL): Possible exposure of secret env "API_TOKEN" in ENV
+══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+Passing secrets via `build-args` or envs or copying secret files can leak them out
+
+See https://avd.aquasec.com/misconfig/ds-0031
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ Dockerfile:6
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   6 [ ENV API_TOKEN="tok_live_catalogo_9f3ac21b"
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+

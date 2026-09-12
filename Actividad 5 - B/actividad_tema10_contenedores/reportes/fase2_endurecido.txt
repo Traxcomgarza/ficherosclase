@@ -1,0 +1,15 @@
+2026-09-12T04:59:10Z	INFO	[misconfig] Misconfiguration scanning is enabled
+2026-09-12T04:59:10Z	INFO	[checks-client] Using existing checks from cache	path="/root/.cache/trivy/policy/content"
+2026-09-12T04:59:11Z	INFO	Detected config files	num=1
+
+Report Summary
+
+┌───────────────────────┬────────────┬───────────────────┐
+│        Target         │    Type    │ Misconfigurations │
+├───────────────────────┼────────────┼───────────────────┤
+│ Dockerfile.endurecido │ dockerfile │         0         │
+└───────────────────────┴────────────┴───────────────────┘
+Legend:
+- '-': Not scanned
+- '0': Clean (no security findings detected)
+

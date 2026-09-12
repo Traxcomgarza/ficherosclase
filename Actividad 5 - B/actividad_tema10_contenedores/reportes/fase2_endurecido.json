@@ -1,0 +1,21 @@
+{
+  "SchemaVersion": 2,
+  "Trivy": {
+    "Version": "0.74.0"
+  },
+  "ReportID": "01a093fb-e128-79a3-aea8-97ae129d2291",
+  "CreatedAt": "2026-09-12T04:59:13.064633764Z",
+  "ArtifactName": "Dockerfile.endurecido",
+  "ArtifactType": "filesystem",
+  "Results": [
+    {
+      "Target": "Dockerfile.endurecido",
+      "Class": "config",
+      "Type": "dockerfile",
+      "MisconfSummary": {
+        "Successes": 27,
+        "Failures": 0
+      }
+    }
+  ]
+}

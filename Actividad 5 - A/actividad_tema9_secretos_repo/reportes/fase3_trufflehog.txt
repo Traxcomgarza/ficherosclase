@@ -1,7 +1,7 @@
 🐷🔑🐷  TruffleHog. Unearth your secrets. 🐷🔑🐷
 
-2026-09-12T04:07:24Z	info-0	trufflehog	running source	{"source_manager_worker_id": "S1EWw", "with_units": true}
-2026-09-12T04:07:24Z	info-0	trufflehog	scanning repo	{"source_manager_worker_id": "S1EWw", "unit_kind": "dir", "unit": "/tmp/trufflehog-3463-965498726", "repo": "file:///root/ficherosclase/Actividad%205%20-%20A/actividad_tema9_secretos_repo/repo_despliegue"}
+2026-09-12T04:19:52Z	info-0	trufflehog	running source	{"source_manager_worker_id": "8TwcR", "with_units": true}
+2026-09-12T04:19:52Z	info-0	trufflehog	scanning repo	{"source_manager_worker_id": "8TwcR", "unit_kind": "dir", "unit": "/tmp/trufflehog-4081-4103942120", "repo": "file:///root/ficherosclase/Actividad%205%20-%20A/actividad_tema9_secretos_repo/repo_despliegue"}
 Found unverified result 🐷🔑❓
 Detector Type: AWS
 Decoder Type: PLAIN
@@ -12,7 +12,7 @@ Email: Dev Tienda <dev@tienda.local>
 File: despliegue_catalogo.py
 Line: 3
 Repository: file:///root/ficherosclase/Actividad%205%20-%20A/actividad_tema9_secretos_repo/repo_despliegue
-Repository_local_path: /tmp/trufflehog-3463-965498726
+Repository_local_path: /tmp/trufflehog-4081-4103942120
 Timestamp: 2026-09-12 04:03:11 +0000
 
-2026-09-12T04:07:24Z	info-0	trufflehog	finished scanning	{"chunks": 5, "bytes": 709, "verified_secrets": 0, "unverified_secrets": 1, "scan_duration": "21.640458ms", "trufflehog_version": "3.97.2", "verification_caching": {"Hits":0,"Misses":0,"HitsWasted":0,"AttemptsSaved":0,"VerificationTimeSpentMS":0}}
+2026-09-12T04:19:52Z	info-0	trufflehog	finished scanning	{"chunks": 5, "bytes": 709, "verified_secrets": 0, "unverified_secrets": 1, "scan_duration": "20.187249ms", "trufflehog_version": "3.97.2", "verification_caching": {"Hits":0,"Misses":0,"HitsWasted":0,"AttemptsSaved":0,"VerificationTimeSpentMS":0}}
