@@ -1,0 +1,6 @@
+bin/
+venv/
+reportes/
+__pycache__/
+*.pyc
+plataforma_pedidos/.git/

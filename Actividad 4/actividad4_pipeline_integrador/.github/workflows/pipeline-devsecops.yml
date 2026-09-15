@@ -1,0 +1,140 @@
+# ACTIVIDAD 4 - Pipeline integrador de DevSecOps - LSCA2314
+# Version en GitHub Actions del MISMO pipeline del Jenkinsfile.
+#
+# Se entrega junto con el Jenkinsfile para mostrar que la logica de control no
+# depende de la herramienta: cambian las palabras, no los controles.
+#
+# Valores ficticios y herramientas locales/gratuitas: no se necesita ninguna
+# cuenta de pago ni ningun servicio externo.
+
+name: pipeline-devsecops-plataforma-pedidos
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  SEMGREP_SEND_METRICS: "off"
+
+jobs:
+
+  controles-de-codigo:
+    name: Secretos, dependencias y codigo propio
+    runs-on: ubuntu-latest
+    outputs:
+      secretos_limpios: ${{ steps.secretos.outputs.limpio }}
+    steps:
+      - name: Descargar el repositorio CON historial completo
+        uses: actions/checkout@v4
+        with:
+          # fetch-depth: 0 trae TODOS los commits.
+          #
+          # Por que es obligatorio aqui: por defecto Actions hace un clon
+          # superficial (solo el ultimo commit). Con ese clon, un escaneo de
+          # secretos solo ve los archivos actuales, y una credencial que se
+          # subio y luego se "limpio" en un commit posterior queda invisible.
+          # El resultado seria un pipeline en verde sobre un repositorio que
+          # sigue teniendo la credencial publicada en su historial.
+          # Costo: el clon tarda mas. Beneficio: el control es real.
+          fetch-depth: 0
+
+      - name: Preparar entorno
+        run: |
+          chmod +x bootstrap.sh pipeline_local.sh etapas/*.sh
+          ./bootstrap.sh
+
+      - name: Etapa 10 - Secretos en el codigo
+        id: secretos
+        run: |
+          if bash etapas/10_secretos_arbol.sh; then
+            echo "limpio=si" >> "$GITHUB_OUTPUT"
+          else
+            echo "limpio=no" >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
+
+      - name: Etapa 20 - Secretos en el historial
+        run: bash etapas/20_secretos_historial.sh
+
+      - name: Etapa 30 - Dependencias (SCA)
+        run: bash etapas/30_sca.sh
+
+      - name: Etapa 40 - Codigo propio (SAST)
+        run: bash etapas/40_sast.sh
+
+      - name: Guardar reportes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reportes-codigo
+          path: reportes/
+
+  # Job CONDICIONADO: Trivy (infraestructura e imagen) y el SBOM solo corren
+  # si el job anterior confirmo que el codigo no tiene secretos dentro.
+  infraestructura-imagen-sbom:
+    name: Trivy (IaC e imagen) y SBOM
+    runs-on: ubuntu-latest
+    needs: controles-de-codigo
+    if: needs.controles-de-codigo.outputs.secretos_limpios == 'si'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Preparar entorno
+        run: |
+          chmod +x bootstrap.sh etapas/*.sh
+          ./bootstrap.sh
+
+      - name: Etapa 50 - Infraestructura como codigo
+        run: bash etapas/50_iac.sh
+
+      - name: Etapa 60 - Imagen de contenedor
+        run: bash etapas/60_imagen.sh
+
+      - name: Etapa 70 - SBOM en CycloneDX
+        run: bash etapas/70_sbom.sh
+
+      - name: Publicar el SBOM como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-cyclonedx
+          path: reportes/sbom_cyclonedx.json
+
+  pruebas-dinamicas:
+    name: DAST sobre la aplicacion en ejecucion
+    runs-on: ubuntu-latest
+    needs: controles-de-codigo
+    steps:
+      - uses: actions/checkout@v4
+      - name: Preparar entorno
+        run: |
+          chmod +x bootstrap.sh etapas/*.sh
+          ./bootstrap.sh
+      - name: Etapa 80 - DAST
+        env:
+          # El token se inyecta en tiempo de ejecucion, nunca vive en el codigo.
+          SLACK_WEBHOOK_TOKEN: ${{ secrets.SLACK_WEBHOOK_TOKEN || 'token-de-prueba-inyectado' }}
+        run: bash etapas/80_dast.sh
+
+  puerta-de-control:
+    name: Puerta de control, bitacora y notificacion
+    runs-on: ubuntu-latest
+    needs: [controles-de-codigo, infraestructura-imagen-sbom, pruebas-dinamicas]
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+      - name: Resultado consolidado
+        run: |
+          echo "Resultado de cada job:"
+          echo "  controles-de-codigo:          ${{ needs.controles-de-codigo.result }}"
+          echo "  infraestructura-imagen-sbom:  ${{ needs.infraestructura-imagen-sbom.result }}"
+          echo "  pruebas-dinamicas:            ${{ needs.pruebas-dinamicas.result }}"
+          if [ "${{ needs.controles-de-codigo.result }}" != "success" ] || \
+             [ "${{ needs.pruebas-dinamicas.result }}" != "success" ]; then
+            echo "DESPLIEGUE BLOQUEADO"
+            exit 1
+          fi
+          echo "DESPLIEGUE PERMITIDO"

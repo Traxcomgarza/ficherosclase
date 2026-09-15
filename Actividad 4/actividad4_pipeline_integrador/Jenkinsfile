@@ -1,0 +1,127 @@
+// ACTIVIDAD 4 - Pipeline integrador de DevSecOps - LSCA2314
+// Plataforma de Pedidos
+//
+// Cada etapa llama al MISMO script que usa ./pipeline_local.sh, asi que lo
+// que pruebes localmente es exactamente lo que corre aqui.
+//
+// Tu trabajo: completar los dos bloques marcados con TODO.
+
+pipeline {
+    agent any
+
+    environment {
+        // El token NUNCA vive en el codigo (Tema 8). En Jenkins se inyecta
+        // desde las credenciales del servidor. Con valores ficticios para la
+        // practica; en produccion vendria del gestor de secretos.
+        SLACK_WEBHOOK_TOKEN = 'token-de-prueba-inyectado'
+        SEMGREP_SEND_METRICS = 'off'
+    }
+
+    options {
+        timestamps()
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+
+    stages {
+
+        stage('Preparar entorno') {
+            steps {
+                sh 'chmod +x bootstrap.sh pipeline_local.sh etapas/*.sh'
+                sh './bootstrap.sh'
+            }
+        }
+
+        stage('10 - Secretos en el codigo') {
+            steps {
+                // Esta etapa SI debe tumbar el build cuando encuentra algo.
+                sh 'bash etapas/10_secretos_arbol.sh'
+            }
+        }
+
+        stage('20 - Secretos en el historial') {
+            steps {
+                // Nunca bloquea, pero deja constancia. Requiere historial
+                // completo: en Jenkins se consigue con un checkout sin
+                // shallow clone; en GitHub Actions con fetch-depth: 0.
+                sh 'bash etapas/20_secretos_historial.sh'
+            }
+        }
+
+        stage('30 - Dependencias (SCA)') {
+            steps {
+                sh 'bash etapas/30_sca.sh'
+            }
+        }
+
+        stage('40 - Codigo propio (SAST)') {
+            steps {
+                sh 'bash etapas/40_sast.sh'
+            }
+        }
+
+        // =====================================================================
+        // TODO 1 - ETAPA CONDICIONADA
+        //
+        // Las etapas 50 (IaC), 60 (imagen) y 70 (SBOM) solo deben ejecutarse
+        // si la Etapa 10 (secretos en el codigo) paso. No tiene sentido
+        // analizar la infraestructura ni construir la imagen de un repositorio
+        // que todavia tiene credenciales dentro.
+        //
+        // Completa el bloque `when` de abajo para que estas etapas se salten
+        // cuando el archivo reportes/.10_exit no contenga "0".
+        //
+        // Pista: dentro de `when { expression { ... } }` puedes leer el archivo
+        //        con readFile('reportes/.10_exit').trim() y compararlo con '0'.
+        // =====================================================================
+        stage('50-70 - Infraestructura, imagen y SBOM') {
+            when {
+                expression {
+                    return readFile('reportes/.10_exit').trim() == '0'
+                }
+            }
+            steps {
+                sh 'bash etapas/50_iac.sh'
+                sh 'bash etapas/60_imagen.sh'
+                sh 'bash etapas/70_sbom.sh'
+                archiveArtifacts artifacts: 'reportes/sbom_cyclonedx.json', allowEmptyArchive: true
+            }
+        }
+
+        stage('80 - Pruebas dinamicas (DAST)') {
+            steps {
+                sh 'bash etapas/80_dast.sh'
+            }
+        }
+    }
+
+    post {
+        // =====================================================================
+        // TODO 2 - PUERTA DE CONTROL, BITACORA Y NOTIFICACION
+        //
+        // Aqui va el cierre del pipeline. Debe ejecutarse SIEMPRE (pase lo que
+        // pase en las etapas anteriores), porque la puerta de control es la que
+        // consolida el resultado, escribe la bitacora y avisa al equipo.
+        //
+        // Completa el bloque `always` para que:
+        //   1. Ejecute la etapa 90 (bash etapas/90_gate.sh). Usa un modo que
+        //      no aborte el bloque cuando el gate devuelve codigo 1, para que
+        //      los reportes alcancen a archivarse.
+        //   2. Archive los reportes como artefactos del build:
+        //      archiveArtifacts artifacts: 'reportes/**', allowEmptyArchive: true
+        //   3. Marque el build como FAILURE si el gate bloqueo el despliegue.
+        //
+        // Pista: `def codigo = sh(script: 'bash etapas/90_gate.sh', returnStatus: true)`
+        //        te da el codigo de salida sin abortar; luego puedes hacer
+        //        `if (codigo != 0) { currentBuild.result = 'FAILURE' }`.
+        // =====================================================================
+        always {
+            script {
+                def codigo = sh(script: 'bash etapas/90_gate.sh', returnStatus: true)
+                archiveArtifacts artifacts: 'reportes/**', allowEmptyArchive: true
+                if (codigo != 0) {
+                    currentBuild.result = 'FAILURE'
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,21 @@
+rules:
+  - id: subprocess-shell-true
+    languages: [python]
+    severity: ERROR
+    message: "Comando de shell construido con concatenacion: permite inyeccion de comandos."
+    patterns:
+      - pattern: subprocess.call($CMD, shell=True)
+
+  - id: md5-inseguro
+    languages: [python]
+    severity: WARNING
+    message: "MD5 no es apto para identificadores ni contrasenas."
+    patterns:
+      - pattern: hashlib.md5(...)
+
+  - id: flask-debug-en-produccion
+    languages: [python]
+    severity: ERROR
+    message: "debug=True expone la consola interactiva de Werkzeug: ejecucion remota de codigo."
+    patterns:
+      - pattern: $APP.run(..., debug=True, ...)
